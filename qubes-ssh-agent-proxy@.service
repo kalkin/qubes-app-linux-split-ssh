@@ -1,0 +1,6 @@
+[Service]
+ExecStart=/usr/bin/qrexec-client-vm "" qubes.SshAgent
+StandartOutput=socket
+StandardInput=socket
+User=user
+Group=user

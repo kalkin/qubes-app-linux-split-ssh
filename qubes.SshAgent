@@ -1,3 +1,4 @@
 #!/bin/sh
 notify-send "[`qubesdb-read /name`] SSH agent access from: $QREXEC_REMOTE_DOMAIN"
+SSH_AUTH_SOCK=/run/qubes-ssh-agent/ssh-agent.socket
 ncat -U $SSH_AUTH_SOCK

@@ -1,0 +1,12 @@
+[Unit]
+Description=SplitSSH proxy to the ssh-vault
+ConditionPathExists=/var/run/qubes-service/ssh-agent-proxy
+
+[Socket]
+ListenStream=/tmp/ssh-agent-proxy.socket
+Accept=yes
+SocketUser=user
+SocketGroup=user
+
+[Install]
+WantedBy=sockets.target

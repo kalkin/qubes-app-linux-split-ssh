@@ -22,7 +22,7 @@
 
 Name:		qubes-ssh-split
 Version:	%{version}
-Release:	1%{dist}
+Release:	0%{dist}
 Summary:	The Qubes service for secure ssh separation
 
 Group:		Qubes
@@ -31,6 +31,7 @@ License:	GPL
 URL:		http://www.qubes-os.org
 
 Requires:   openssh
+Requires:   nmap-ncat
 
 %define _builddir %(pwd)
 
@@ -44,14 +45,33 @@ the ssh private key should be similar to running ‘ssh -A’ into the client Ap
 %build
 
 %install
+install -D qubes-ssh-agent.service \
+        $RPM_BUILD_ROOT/usr/lib/systemd/system/qubes-ssh-agent.service
 install -D qubes.SshAgent $RPM_BUILD_ROOT/etc/qubes-rpc/qubes.SshAgent
-install -D bashrc_client $RPM_BUILD_ROOT/etc/profile.d/qubes-ssh.sh
+install -D qubes-ssh-agent-proxy@.service \
+        $RPM_BUILD_ROOT/usr/lib/systemd/system/qubes-ssh-agent-proxy@.service
+install -D qubes-ssh-agent-proxy.socket \
+        $RPM_BUILD_ROOT/usr/lib/systemd/system/qubes-ssh-agent-proxy.socket
+install -D qubes-ssh-agent-proxy.sh $RPM_BUILD_ROOT/etc/profile.d/qubes-ssh-agent-proxy.sh
 
+
+%post
+if [ $1 -eq 1 ]; then
+    systemctl enable qubes-ssh-agent
+    systemctl enable qubes-ssh-agent-proxy.socket
+fi
+
+%preun
+if [ $1 -eq 0 ]; then
+    systemctl disable qubes-ssh-agent
+    systemctl disable qubes-ssh-agent-proxy.socket
+fi
 
 %files
-%config(noreplace) %attr(0664,root,root) /etc/qubes-rpc/qubes.SshAgent
-/etc/profile.d/qubes-ssh.sh
-
-
+%attr(0664,root,root)
+/usr/lib/systemd/system/qubes-ssh-agent.service
+/usr/lib/systemd/system/qubes-ssh-agent-proxy@.service
+/usr/lib/systemd/system/qubes-ssh-agent-proxy.socket
+/etc/qubes-rpc/qubes.SshAgent
+/etc/profile.d/qubes-ssh-agent-proxy.sh
 %changelog
-

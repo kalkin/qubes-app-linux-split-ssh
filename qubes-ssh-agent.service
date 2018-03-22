@@ -1,0 +1,17 @@
+[Unit]
+Description=Split SSH Agent
+ConditionPathExists=/var/run/qubes-service/ssh-agent
+After=qubes-sysinit.service
+
+[Service]
+Type=forking
+User=user
+Group=user
+RuntimeDirectory=qubes-ssh-agent
+RuntimeDirectoryMode=0700
+Environment=SSH_AUTH_SOCK=%t/qubes-ssh-agent/ssh-agent.socket
+ExecStart=/usr/bin/ssh-agent -a $SSH_AUTH_SOCK
+ExecStartPost=ssh-add
+
+[Install]
+WantedBy=multi-user.target
